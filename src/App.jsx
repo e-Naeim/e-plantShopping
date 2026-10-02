@@ -1,49 +1,33 @@
-
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProductList from './ProductList';
-import './App.css';
 import AboutUs from './AboutUs';
+import './App.css';
 
-function App() {
-  
-  const [showProductList, setShowProductList] = useState(false);
+const currentPage = () => ['plants', 'cart'].includes(window.location.hash.slice(1))
+  ? window.location.hash.slice(1) : 'home';
 
-  const handleGetStartedClick = () => {
-    setShowProductList(true);
-  };
-
-  const handleHomeClick = () => {
-    setShowProductList(false);
-  };
-
+export default function App() {
+  const [page, setPage] = useState(currentPage);
+  useEffect(() => {
+    const handleNavigation = () => setPage(currentPage());
+    window.addEventListener('hashchange', handleNavigation);
+    return () => window.removeEventListener('hashchange', handleNavigation);
+  }, []);
+  useEffect(() => { document.title = `${page === 'home' ? 'Welcome' : page === 'plants' ? 'Plants' : 'Your Cart'} | Paradise Nursery`; }, [page]);
+  if (page !== 'home') return <ProductList page={page} />;
   return (
-    <div className="app-container">
-      <div className={`landing-page ${showProductList ? 'fade-out' : ''}`}>
-        <div className="background-image"></div>
-        <div className="content">
-         <div className="landing_content">
-         <h1>Welcome To Paradise Nursery</h1>
-          <div className="divider"></div>
-          <p>Where Green Meets Serenity</p>
-         
-          <button className="get-started-button" onClick={handleGetStartedClick}>
-            Get Started
-          </button>
-         </div>
-          <div className="aboutus_container">
-          <AboutUs/>
-          </div>
-          </div>
-
+    <main className="landing-page">
+      <div className="background-image" aria-hidden="true" />
+      <div className="landing-content">
+        <div className="landing-intro">
+          <p className="eyebrow">WHERE GREEN MEETS SERENITY</p>
+          <h1>Paradise<br />Nursery</h1>
+          <p className="landing-tagline">A little green.<br />A lot of joy.</p>
+          <a className="button get-started-button" href="#plants">Get Started <span aria-hidden="true">↗</span></a>
+        </div>
+        <AboutUs />
       </div>
-      <div className={`product-list-container ${showProductList ? 'visible' : ''}`}>
-        <ProductList onHomeClick={handleHomeClick}/>
-      </div>
-    </div>
+      <p className="landing-footer">Thoughtfully chosen plants for your everyday spaces</p>
+    </main>
   );
 }
-
-export default App;
-
-
-
